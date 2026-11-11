@@ -25,11 +25,31 @@ def create_database():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS valuations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            property_id INTEGER,
+            county TEXT NOT NULL,
+            floor_area REAL NOT NULL,
+            bedrooms INTEGER NOT NULL,
+            property_type TEXT NOT NULL,
+            ber_rating TEXT NOT NULL,
+            asking_price REAL NOT NULL,
+            estimated_value REAL NOT NULL,
+            difference REAL NOT NULL,
+            percentage_difference REAL NOT NULL,
+            price_assessment TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (property_id) REFERENCES properties(id)
+        )
+    """)
+
     # Prevent duplicate records when the script is run again.
+    cursor.execute("DELETE FROM valuations")
     cursor.execute("DELETE FROM properties")
     cursor.execute(
-    "DELETE FROM sqlite_sequence WHERE name = 'properties'"
-)
+        "DELETE FROM sqlite_sequence WHERE name IN ('properties', 'valuations')"
+    )
 
     with open(CSV_FILE, mode="r", encoding="utf-8-sig") as csv_file:
         reader = csv.DictReader(csv_file)
